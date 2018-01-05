@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+
+  <title>Homework 4</title>
+<!--
+  <link href="https://fonts.googleapis.com/css?family=Faster+One" rel="stylesheet"> -->
+  <!-- <link rel="stylesheet" href="style.css"> -->
+
+<style>
+.mainpage{
+  width: 400px;
+  margin: 0 auto;
+  margin-top: 200px;
+}
+
+.div1{
+  margin-top: 20px;
+  margin-left: 55px;
+}
+
+.div2{
+  margin-top: 0px;
+  margin-left: 75px;
+}
+
+</style>
+
+
+</head>
+<body>
+
+<script>
+var hWin = 1;
+function othername() {
+  // var requestURL = 'http://www-scf.usc.edu/~deole/airlinelist.json';
+  var requestURL = document.getElementById('nameofFile').value;
+  requestURL = requestURL.trim();
+  if(requestURL.length < 1){
+    window.alert("Please enter a file name");
+    return false;
+  }
+
+  var request = new XMLHttpRequest();
+  request.open('GET', requestURL);
+  request.responseType = 'json';
+  request.send();
+
+  //alert(err.message);
+  //return false;
+
+
+
+  var table = document.createElement("table");
+  table.style.border = "1px solid black";
+  var tr = document.createElement("tr");
+
+
+  request.onload = function() {
+  //console.log("Request", request.status);
+  //console.log("Request", typeof(request.status));
+  if(request.status !== 200){
+    alert("No such file exists");
+    return;
+  }
+  var airlines = request.response;
+  if(airlines === null){
+    alert("Empty JSON");
+    return;
+  }
+  showFlights(airlines);
+  showWindow(airlines);
+
+  function showFlights(jsonObj){
+    if(!jsonObj['Mainline']){
+      alert("Invalid Json data");
+      return;
+    }
+    if (jsonObj['Mainline']['Table']['Row'] == null){
+      window.alert("No airlines");
+      return false;
+    }
+
+    var flights = jsonObj['Mainline']['Table']['Row'];
+    var flightshead = jsonObj['Mainline']['Table']['Header']['Data'];
+
+    var col = [];
+            for (var i = 0; i < flights.length; i++) {
+                for (var key in flights[i]) {
+                    if (col.indexOf(key) === -1) {
+                        col.push(key);
+                    }
+                }
+            }
+
+
+    // var table = document.createElement("table");
+
+     tr = table.insertRow(-1);
+
+    for (var i = 0; i < flightshead.length; i++) {
+        var th = document.createElement("th");
+        th.style.border = "1px solid black";
+        th.innerHTML = flightshead[i] ;
+        tr.appendChild(th);
+    }
+
+          for (var i = 0; i < flights.length; i++) {
+
+        tr = table.insertRow(-1);
+        tr.style.border = "1px solid black";
+
+        for (var j = 0; j < col.length; j++) {
+          if(j != col.length-1 && j != 2 && j != 4){
+            var tabCell = document.createElement("tabCell");
+            tabCell = tr.insertCell(-1);
+            if(flights[i][col[j]] == undefined){
+               flights[i][col[j]] = '';
+            }
+            tabCell.innerHTML = flights[i][col[j]];
+            tabCell.style.border = "1px solid black";
+
+          }
+          if(j == 2){
+
+            var count = 0;
+
+            var list = document.createElement('ul');
+
+          for(var key in flights[i][col[j]]['Hub']){
+            if(flights[i][col[j]]['Hub'] != ""){
+            if(count == 0){
+            var item = document.createElement('li');
+            var dataName = flights[i][col[j]]['Hub'][key];
+            item.appendChild(document.createTextNode(dataName));
+            item.style.fontWeight = 'bold';
+            list.appendChild(item);
+          } else{
+            var item = document.createElement('li');
+            var dataName = flights[i][col[j]]['Hub'][key];
+            item.appendChild(document.createTextNode(dataName));
+            list.appendChild(item);
+          }
+            count++;
+        }
+      }
+
+        var tabCell = document.createElement("tabCell");
+        tabCell = tr.insertCell(-1);
+        tabCell.appendChild(list);
+        tabCell.style.border = "1px solid black";
+          }
+
+if(j == 4){
+          var a = document.createElement('a');
+          var linkText = document.createTextNode(flights[i][col[j]]);
+          var tabCell = document.createElement("tabCell");
+          tabCell = tr.insertCell(-1);
+          a.appendChild(linkText);
+          if(flights[i][col[j]] == undefined){
+             flights[i][col[j]] = '';
+          }
+          a.href = flights[i][col[j]];
+          tabCell.appendChild(a);
+          tabCell.style.border = "1px solid black";
+
+}
+
+            if(j == col.length-1){
+              var img = document.createElement('img');
+              var tabCell = document.createElement("tabCell");
+              tabCell = tr.insertCell(-1);
+
+              console.log(flights[i][col[j]]);
+              if(flights[i][col[j]] !== ""){
+                img.setAttribute("width", "304");
+                img.setAttribute("height", "228");
+                img.src = flights[i][col[j]];
+                tabCell.appendChild(img);
+                tabCell.style.border = "1px solid black";
+
+              } else{
+                tabCell.appendChild(img);
+                tabCell.style.border = "1px solid black";
+
+              }
+
+            }
+
+        }
+          // th.style.border = "1px solid black";
+
+    }
+
+
+
+    }
+
+
+  }
+  function showWindow(jsonObj){
+  if (jsonObj['Mainline']['Table']['Row'] != null){
+  if(hWin != 1)
+    hWin.close();
+  hWin = window.open("", "Assignment4", "height=600,width=900");
+  //if(hWin.document.body.childElementCount > 0)
+    //hWin.document.body.replaceChild(table,table);
+  //else {
+    hWin.document.body.appendChild(table);
+  //}
+  hWin.document.title = "Homework 4";
+}
+}
+
+}
+</script>
+<div class = "mainpage">
+<p><b>Enter URL for Airlines List JSON File</b></p>
+<form name="myform" method="POST" id="location">
+<div class="div1"><input type="text" name="URL" maxlength="255" size="20" id="nameofFile"/></div>
+<br/>
+<div class="div2"><input type="button" name="submit" value="Submit Query" onClick="othername();"/></div>
+</form>
+</div>
+<noscript></noscript>
+</body>
+</html>
