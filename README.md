@@ -1,4 +1,4 @@
-# WebTech
+# Web Technology
 (University of Southern California) CSCI 571 Assignments 
 CSCI-571 (Fall 2016)
 All the assignments can be found at http://cs-server.usc.edu:45678/homeworks.html
